@@ -20,11 +20,12 @@ io.on('connection', (socket) => {
 
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined chat'));
 
-    socket.on('createMessage', (newMeessage) => {
+    socket.on('createMessage', (newMeessage, callBack) => {
         console.log('createMessage', newMeessage);
 
         // =========== io.emit emits the event to all the clients connected inluding this socket=========
         io.emit('newMessage', generateMessage(newMeessage.from, newMeessage.text));
+        callBack('This is from the server');
     });
 
     socket.on('disconnect', () => {
