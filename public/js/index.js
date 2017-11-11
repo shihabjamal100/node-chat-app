@@ -30,27 +30,36 @@ socket.on('newLocationMessage', function (locationMessage) {
 jQuery('#message-form').on('submit', function (e) {
     e.preventDefault(); // this prevents the page from reloading when a new messagge is entered in to the html form
 
+    var messageTextBox = jQuery('[name=message]');
     socket.emit('createMessage', {
         from: 'User',
-        text: jQuery('[name=message]').val()
+        text: messageTextBox.val()
     }, function () {
-        
+        messageTextBox.val('');
     });
 });
 
 var locationButton = jQuery('#send-location');
+var locationButtonNormalText = locationButton.html();
+var locationButtonSendingText = 'Sending location...';
+
 locationButton.on('click', function () {
     if (!navigator.geolocation)
     {
         return alert('Geolocation not supported by your browser.');
     }
 
+    locationButton.attr('disabled', 'disabled').text(locationButtonSendingText);
+
     navigator.geolocation.getCurrentPosition( function (position) {
+        locationButton.removeAttr('disabled').text(locationButtonNormalText);
+
         socket.emit('createLocationMessage', {
             lattitude: position.coords.latitude,
             longitude: position.coords.longitude
         })
     }, function () {
+        locationButton.removeAttr('disabled').text(locationButtonNormalText);
         alert('Unable to fetch location');
     })
 });
